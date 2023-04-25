@@ -14,15 +14,15 @@ public class TransactionService {
         this.transactionRepository = transactionRepository;
     }
 
-    private Optional<Transaction> findTransaction(int id) {
+    public Optional<Transaction> findTransaction(int id) {
         return transactionRepository.findById(id);
     }
 
-    private List<Transaction> findAllTransactions() {
+    public List<Transaction> findAllTransactions() {
         return transactionRepository.findAll();
     }
 
-    private List<Transaction> findAllTransactionsForAccount(String accountNo){
+    public List<Transaction> findAllTransactionsForAccount(String accountNo){
         return transactionRepository.findAllBySrcAccountAccountNumber(accountNo);
     }
 }

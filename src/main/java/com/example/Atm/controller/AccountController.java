@@ -1,6 +1,7 @@
 package com.example.Atm.controller;
 
 import com.example.Atm.entity.Account;
+import com.example.Atm.entity.Transaction;
 import com.example.Atm.service.AccountService;
 import com.example.Atm.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +38,10 @@ public class AccountController {
     }
 
     @GetMapping("/transactions/{accountNumber}")
-    public ResponseEntity<?> getTransactions(@PathVariable("accountNumber") String accountNumber){
+    public ResponseEntity<?> getTransactions(@PathVariable("accountNumber") String accountNumber) {
+        List<Transaction> transactions = this.transactionService.findAllTransactionsForAccount(accountNumber);
 
-
+        return transactions.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+                : new ResponseEntity<>(transactions, HttpStatus.OK);
     }
 }
