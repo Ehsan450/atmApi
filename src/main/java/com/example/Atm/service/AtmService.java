@@ -7,16 +7,23 @@ import com.example.Atm.enumator.TransactionType;
 import com.example.Atm.repository.AccountRepository;
 import com.example.Atm.repository.CardRepository;
 import com.example.Atm.repository.TransactionRepository;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-
+@Service
 public class AtmService {
     private AccountRepository accountRepository;
     private CardRepository cardRepository;
     private TransactionRepository transactionRepository;
 
-    public void withdraw(String cardNo,String pin,double amount){
+    public AtmService(AccountRepository accountRepository, CardRepository cardRepository, TransactionRepository transactionRepository) {
+        this.accountRepository = accountRepository;
+        this.cardRepository = cardRepository;
+        this.transactionRepository = transactionRepository;
+    }
+
+    public boolean withdraw(String cardNo, String pin, double amount) {
         Optional<Card> card = cardRepository.findById(cardNo);
 
         if (card.isPresent()) {
@@ -38,53 +45,53 @@ public class AtmService {
 
 
                     }
-                    throw new RuntimeException("Insufficient Balance");
+                    throw new CustomizedException("Insufficient Balance");
 
 
                 }
-                throw new RuntimeException("Amount must be in multiples of 500");
+                throw new CustomizedException("Amount must be in multiples of 500");
 
             }
 
-            throw new RuntimeException("PIN Incorrect");
+            throw new CustomizedException("PIN Incorrect");
 
         }
-        throw new RuntimeException("Card not found");
+        throw new CustomizedException("Card not found");
 
 
     }
-    public void deposit(String cardNo,String pin,double amount){
-        Optional <Card> card= cardRepository.findById(cardNo);
 
-            if (card.isPresent()) {
-                Card fetchedCard = card.get();
-                if (fetchedCard.getPin().equals(pin)) {
+    public boolean deposit(String cardNo, String pin, double amount) {
+        Optional<Card> card = cardRepository.findById(cardNo);
 
-                    Account account = fetchedCard.getAccount();
-                    if (amount > 0) {
+        if (card.isPresent()) {
+            Card fetchedCard = card.get();
+            if (fetchedCard.getPin().equals(pin)) {
 
-                        account.setBalance(account.getBalance() + amount);
-                        accountRepository.saveAndFlush(account);
-                        System.out.println("Deposited Successfully : " + amount);
-                        Transaction transaction = new Transaction();
-                        transaction.setTrxType(TransactionType.DEPOSIT);
-                        transaction.setSrcAccount(account);
-                        transaction.setDestAccount(account);
-                        transaction.setTransactionOn(LocalDateTime.now());
-                        transactionRepository.saveAndFlush(transaction);
-                    }
-                    System.out.println("Input amount wrong");
+                Account account = fetchedCard.getAccount();
+                if (amount > 0) {
 
+                    account.setBalance(account.getBalance() + amount);
+                    accountRepository.saveAndFlush(account);
+                    System.out.println("Deposited Successfully : " + amount);
+                    Transaction transaction = new Transaction();
+                    transaction.setTrxType(TransactionType.DEPOSIT);
+                    transaction.setSrcAccount(account);
+                    transaction.setDestAccount(account);
+                    transaction.setTransactionOn(LocalDateTime.now());
+                    transactionRepository.saveAndFlush(transaction);
 
+                    return true;
                 }
-                System.out.println("Wrong Pin");
+                throw new CustomizedException("Input amount wrong");
 
             }
-            System.out.println("Card not Found");
-        }
-
+            throw new CustomizedException("Wrong Pin");
 
         }
+        throw new CustomizedException("Card not Found");
+    }
+}
 
 
 

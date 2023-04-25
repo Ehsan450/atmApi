@@ -6,18 +6,19 @@ import com.example.Atm.repository.AccountRepository;
 import com.example.Atm.repository.CardRepository;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
-@Setter
-@Getter
+
 public class AccountService {
     private final AccountRepository accountRepository;
     private final CardRepository cardRepository;
 
-
+    @Autowired
     public AccountService(AccountRepository accountRepository, CardRepository cardRepository) {
         this.accountRepository = accountRepository;
         this.cardRepository = cardRepository;
@@ -27,9 +28,9 @@ public class AccountService {
         return accountRepository.findById(id);
     }
 
-    public Account createAccount(String accountName) {
+    public Account createAccount() {
         Account savedAccount = new Account();
-        savedAccount.setAccountName(accountName);
+//        savedAccount.setAccountName(accountName);
         savedAccount.setAccountNumber(Utils.generate(14));
         savedAccount.setBalance(50000.78);
         accountRepository.save(savedAccount);
@@ -40,8 +41,12 @@ public class AccountService {
         cardRepository.saveAndFlush(generatedCard);
         return savedAccount;
     }
-    public void deleteAccount(String id){
+
+    public void deleteAccount(String id) {
         accountRepository.deleteById(id);
 
+    }
+    public List <Account> findAllAccount(){
+        return accountRepository.findAll();
     }
 }

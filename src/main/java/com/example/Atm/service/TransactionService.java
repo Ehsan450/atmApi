@@ -3,10 +3,11 @@ package com.example.Atm.service;
 import com.example.Atm.entity.Transaction;
 import com.example.Atm.repository.AccountRepository;
 import com.example.Atm.repository.TransactionRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-
+@Service
 public class TransactionService {
  private TransactionRepository transactionRepository;
     public TransactionService(TransactionRepository transactionRepository) {
