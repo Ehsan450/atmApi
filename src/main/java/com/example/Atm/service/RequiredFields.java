@@ -15,5 +15,7 @@ public class RequiredFields {
 
     private double amount;
 
+    private String srcAccount;
+
     private String destAccount;
 }

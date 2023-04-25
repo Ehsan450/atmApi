@@ -17,13 +17,11 @@ public class AccountController {
     private final AccountService accountService;
     private final TransactionService transactionService;
 
+    @Autowired
     public AccountController(AccountService accountService, TransactionService transactionService) {
         this.accountService = accountService;
         this.transactionService = transactionService;
     }
-
-    @Autowired
-
 
     @GetMapping("/")
     public ResponseEntity<?> getAllAccount() {
@@ -36,5 +34,11 @@ public class AccountController {
     @PostMapping(value = "/", consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<?> saveAccount(@RequestBody Account account) {
         return new ResponseEntity<>(this.accountService.createAccount(account), HttpStatus.CREATED);
+    }
+
+    @GetMapping("/transactions/{accountNumber}")
+    public ResponseEntity<?> getTransactions(@PathVariable("accountNumber") String accountNumber){
+
+
     }
 }

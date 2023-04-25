@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 @Service
 public class TransactionService {
- private TransactionRepository transactionRepository;
+ private final TransactionRepository transactionRepository;
     public TransactionService(TransactionRepository transactionRepository) {
         this.transactionRepository = transactionRepository;
     }
@@ -20,5 +20,9 @@ public class TransactionService {
 
     private List<Transaction> findAllTransactions() {
         return transactionRepository.findAll();
+    }
+
+    private List<Transaction> findAllTransactionsForAccount(String accountNo){
+        return transactionRepository.findAllBySrcAccountAccountNumber(accountNo);
     }
 }
