@@ -5,11 +5,15 @@ import com.example.Atm.service.RequiredFields;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-@Controller
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping(value = "/atm", produces = {MediaType.APPLICATION_JSON_VALUE})
 public class AtmController {
     private final AtmService atmService;
 
@@ -19,9 +23,7 @@ public class AtmController {
     }
 
 
-
-
-    @PostMapping("/deposit")
+    @PostMapping(value = "/deposit")
     public ResponseEntity<?> depositBalance(@RequestBody RequiredFields requiredFields) {
         // atmService.deposit(actions.getCardNo(), actions.getPin(), actions.getAmount());
 
@@ -30,12 +32,16 @@ public class AtmController {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("isSuccessful", successful);
 
-        return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+        return new ResponseEntity<>(jsonObject.toString(), HttpStatus.OK);
     }
 
+    @PostMapping(value = "/withdraw")
     public ResponseEntity<?> withdrawBalance(@RequestBody RequiredFields requiredFields) {
+        boolean done = this.atmService.withdraw(requiredFields.getCardNo(), requiredFields.getPin(), requiredFields.getAmount());
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("isSuccessful", done);
 
-        return new ResponseEntity<>(//"Card Number ?" +  atmService.withdraw(requiredFields.getCardNo(), requiredFields.getPin(), requiredFields.getAmount())
+        return new ResponseEntity<>(jsonObject.toString(),
                 HttpStatus.OK);
     }
 

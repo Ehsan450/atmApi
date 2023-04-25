@@ -42,6 +42,7 @@ public class AtmService {
                         transaction.setDestAccount(account);
                         transaction.setTransactionOn(LocalDateTime.now());
                         transactionRepository.saveAndFlush(transaction);
+                        return true;
 
 
                     }
@@ -73,7 +74,6 @@ public class AtmService {
 
                     account.setBalance(account.getBalance() + amount);
                     accountRepository.saveAndFlush(account);
-                    System.out.println("Deposited Successfully : " + amount);
                     Transaction transaction = new Transaction();
                     transaction.setTrxType(TransactionType.DEPOSIT);
                     transaction.setSrcAccount(account);

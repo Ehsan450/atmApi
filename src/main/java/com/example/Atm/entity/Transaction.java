@@ -24,6 +24,7 @@ public class Transaction {
     @Column(name = "transaction_on")
     private LocalDateTime transactionOn;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "trx_type")
     private TransactionType trxType;
 
