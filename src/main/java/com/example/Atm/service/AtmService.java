@@ -36,7 +36,7 @@ public class AtmService {
                 Account account = fetchedCard.getAccount();
                 account.withdraw(amount);
                 this.accountRepository.saveAndFlush(account);
-                System.out.println("Withdrawn: " + amount);
+
                 Transaction transaction = new Transaction();
                 transaction.setTrxType(TransactionType.WITHDRAW);
                 transaction.setSrcAccount(account);
