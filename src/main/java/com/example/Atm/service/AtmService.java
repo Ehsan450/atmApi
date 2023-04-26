@@ -4,6 +4,7 @@ import com.example.Atm.entity.Account;
 import com.example.Atm.entity.Card;
 import com.example.Atm.entity.Transaction;
 import com.example.Atm.enumator.TransactionType;
+import com.example.Atm.exception.CardNotFoundException;
 import com.example.Atm.exception.CustomizedException;
 import com.example.Atm.repository.AccountRepository;
 import com.example.Atm.repository.CardRepository;
@@ -48,7 +49,7 @@ public class AtmService {
             }
             throw new CustomizedException("PIN Incorrect");
         }
-        throw new CustomizedException("Card not found");
+        throw new CardNotFoundException("Card not found");
 
     }
 
@@ -71,7 +72,7 @@ public class AtmService {
             }
             throw new CustomizedException("Wrong Pin");
         }
-        throw new CustomizedException("Card not Found");
+        throw new CardNotFoundException("Card not Found");
     }
 
 
@@ -111,7 +112,7 @@ public class AtmService {
             }
             throw new CustomizedException("Incorrect PIN");
         }
-        throw new CustomizedException("Card Not Found");
+        throw new CardNotFoundException("Card Not Found");
     }
 }
 
