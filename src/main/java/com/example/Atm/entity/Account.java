@@ -1,6 +1,6 @@
 package com.example.Atm.entity;
 
-import com.example.Atm.service.CustomizedException;
+import com.example.Atm.exception.CustomizedException;
 import com.example.Atm.service.Utils;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

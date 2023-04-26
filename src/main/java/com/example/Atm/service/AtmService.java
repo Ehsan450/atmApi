@@ -4,6 +4,7 @@ import com.example.Atm.entity.Account;
 import com.example.Atm.entity.Card;
 import com.example.Atm.entity.Transaction;
 import com.example.Atm.enumator.TransactionType;
+import com.example.Atm.exception.CustomizedException;
 import com.example.Atm.repository.AccountRepository;
 import com.example.Atm.repository.CardRepository;
 import com.example.Atm.repository.TransactionRepository;
@@ -27,20 +28,20 @@ public class AtmService {
     }
 
     public boolean withdraw(String cardNo, String pin, double amount) {
-        Optional<Card> card = cardRepository.findById(cardNo);
+        Optional<Card> card = this.cardRepository.findById(cardNo);
 
         if (card.isPresent()) {
             Card fetchedCard = card.get();
             if (fetchedCard.getPin().equals(pin)) {
                 Account account = fetchedCard.getAccount();
                 account.withdraw(amount);
-                accountRepository.saveAndFlush(account);
+                this.accountRepository.saveAndFlush(account);
                 System.out.println("Withdrawn: " + amount);
                 Transaction transaction = new Transaction();
                 transaction.setTrxType(TransactionType.WITHDRAW);
                 transaction.setSrcAccount(account);
                 transaction.setDestAccount(account);
-                transactionRepository.saveAndFlush(transaction);
+                this.transactionRepository.saveAndFlush(transaction);
 
                 return true;
 
@@ -59,12 +60,12 @@ public class AtmService {
             if (fetchedCard.getPin().equals(pin)) {
                 Account account = fetchedCard.getAccount();
                 account.deposit(amount);
-                accountRepository.saveAndFlush(account);
+                this.accountRepository.saveAndFlush(account);
                 Transaction transaction = new Transaction();
                 transaction.setTrxType(TransactionType.DEPOSIT);
                 transaction.setSrcAccount(account);
                 transaction.setDestAccount(account);
-                transactionRepository.saveAndFlush(transaction);
+                this.transactionRepository.saveAndFlush(transaction);
 
                 return true;
             }
@@ -83,20 +84,20 @@ public class AtmService {
                 if (requiredFields.getAmount() > 0) {
                     if (srcAccount.getBalance() >= requiredFields.getAmount()) {
                         if (fetchedCard.getAccount().getAccountNumber().equals(requiredFields.getSrcAccount())) {
-                            Optional<Account> destinationAccount = accountRepository.findById(requiredFields.getDestAccount());
+                            Optional<Account> destinationAccount = this.accountRepository.findById(requiredFields.getDestAccount());
                             if (destinationAccount.isPresent()) {
                                 Account destAccount = destinationAccount.get();
                                 srcAccount.withdraw(requiredFields.getAmount());
-                                accountRepository.saveAndFlush(srcAccount);
+                                this.accountRepository.saveAndFlush(srcAccount);
 
                                 Transaction transaction = new Transaction();
                                 transaction.setTrxType(TransactionType.TRANSFER);
                                 transaction.setSrcAccount(srcAccount);
                                 transaction.setDestAccount(destAccount);
-                                transactionRepository.saveAndFlush(transaction);
+                                this.transactionRepository.saveAndFlush(transaction);
 
                                 destAccount.deposit(requiredFields.getAmount());
-                                accountRepository.saveAndFlush(destAccount);
+                                this.accountRepository.saveAndFlush(destAccount);
 
                                 return true;
                             }

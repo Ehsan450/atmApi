@@ -1,4 +1,4 @@
-package com.example.Atm.service;
+package com.example.Atm.exception;
 
 public class CustomizedException extends RuntimeException {
     public CustomizedException(String s){
