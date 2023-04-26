@@ -21,6 +21,7 @@ public class Transaction {
     @Column(name = "id")
     private int id;
 
+    @Setter(AccessLevel.NONE)
     @Column(name = "transaction_on")
     private LocalDateTime transactionOn;
 
@@ -35,4 +36,9 @@ public class Transaction {
     @ManyToOne
     @JoinColumn(name = "dest_account", referencedColumnName = "account_no")
     private Account destAccount;
+
+    @PrePersist
+    private void init() {
+        this.transactionOn = LocalDateTime.now();
+    }
 }

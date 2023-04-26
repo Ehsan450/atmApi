@@ -29,23 +29,22 @@ public class AccountService {
     public Account createAccount(Account account) {
         Account savedAccount = new Account();
         savedAccount.setAccountName(account.getAccountName());
-        savedAccount.setAccountNumber(Utils.generate(14));
-        savedAccount.setBalance(50000.78);
-        accountRepository.save(savedAccount);
+        this.accountRepository.save(savedAccount);
+
         Card generatedCard = new Card();
         generatedCard.setCardNo(Utils.generate(12));
         generatedCard.setPin(Utils.generate(4));
         generatedCard.setAccount(savedAccount);
-        cardRepository.saveAndFlush(generatedCard);
+        this.cardRepository.saveAndFlush(generatedCard);
+
         return savedAccount;
     }
 
     public void deleteAccount(String id) {
-        accountRepository.deleteById(id);
-
+        this.accountRepository.deleteById(id);
     }
 
     public List<Account> findAllAccount() {
-        return accountRepository.findAll();
+        return this.accountRepository.findAll();
     }
 }

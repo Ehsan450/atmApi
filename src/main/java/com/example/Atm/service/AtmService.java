@@ -7,17 +7,20 @@ import com.example.Atm.enumator.TransactionType;
 import com.example.Atm.repository.AccountRepository;
 import com.example.Atm.repository.CardRepository;
 import com.example.Atm.repository.TransactionRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
+
 @Service
 public class AtmService {
-    private AccountRepository accountRepository;
-    private CardRepository cardRepository;
-    private TransactionRepository transactionRepository;
+    private final AccountRepository accountRepository;
+    private final CardRepository cardRepository;
+    private final TransactionRepository transactionRepository;
 
-    public AtmService(AccountRepository accountRepository, CardRepository cardRepository, TransactionRepository transactionRepository) {
+    @Autowired
+    public AtmService(AccountRepository accountRepository, CardRepository cardRepository,
+                      TransactionRepository transactionRepository) {
         this.accountRepository = accountRepository;
         this.cardRepository = cardRepository;
         this.transactionRepository = transactionRepository;
@@ -30,35 +33,21 @@ public class AtmService {
             Card fetchedCard = card.get();
             if (fetchedCard.getPin().equals(pin)) {
                 Account account = fetchedCard.getAccount();
+                account.withdraw(amount);
+                accountRepository.saveAndFlush(account);
+                System.out.println("Withdrawn: " + amount);
+                Transaction transaction = new Transaction();
+                transaction.setTrxType(TransactionType.WITHDRAW);
+                transaction.setSrcAccount(account);
+                transaction.setDestAccount(account);
+                transactionRepository.saveAndFlush(transaction);
 
-                if (amount > 0 && amount % 500 == 0) {
-                    if (amount <= account.getBalance()) {
-                        account.setBalance(account.getBalance() - amount);
-                        accountRepository.saveAndFlush(account);
-                        System.out.println("Withdrawn: " + amount);
-                        Transaction transaction = new Transaction();
-                        transaction.setTrxType(TransactionType.WITHDRAW);
-                        transaction.setSrcAccount(account);
-                        transaction.setDestAccount(account);
-                        transaction.setTransactionOn(LocalDateTime.now());
-                        transactionRepository.saveAndFlush(transaction);
-                        return true;
-
-
-                    }
-                    throw new CustomizedException("Insufficient Balance");
-
-
-                }
-                throw new CustomizedException("Amount must be in multiples of 500");
+                return true;
 
             }
-
             throw new CustomizedException("PIN Incorrect");
-
         }
         throw new CustomizedException("Card not found");
-
 
     }
 
@@ -68,33 +57,62 @@ public class AtmService {
         if (card.isPresent()) {
             Card fetchedCard = card.get();
             if (fetchedCard.getPin().equals(pin)) {
-
                 Account account = fetchedCard.getAccount();
-                if (amount > 0) {
+                account.deposit(amount);
+                accountRepository.saveAndFlush(account);
+                Transaction transaction = new Transaction();
+                transaction.setTrxType(TransactionType.DEPOSIT);
+                transaction.setSrcAccount(account);
+                transaction.setDestAccount(account);
+                transactionRepository.saveAndFlush(transaction);
 
-                    account.setBalance(account.getBalance() + amount);
-                    accountRepository.saveAndFlush(account);
-                    Transaction transaction = new Transaction();
-                    transaction.setTrxType(TransactionType.DEPOSIT);
-                    transaction.setSrcAccount(account);
-                    transaction.setDestAccount(account);
-                    transaction.setTransactionOn(LocalDateTime.now());
-                    transactionRepository.saveAndFlush(transaction);
-
-                    return true;
-                }
-                throw new CustomizedException("Input amount wrong");
-
+                return true;
             }
             throw new CustomizedException("Wrong Pin");
-
         }
         throw new CustomizedException("Card not Found");
     }
+
+
+    public boolean transfer(RequiredFields requiredFields) {
+        Optional<Card> card = cardRepository.findById(requiredFields.getCardNo());
+        if (card.isPresent()) {
+            Card fetchedCard = card.get();
+            if (fetchedCard.getPin().equals(requiredFields.getPin())) {
+                Account srcAccount = fetchedCard.getAccount();
+                if (requiredFields.getAmount() > 0) {
+                    if (srcAccount.getBalance() >= requiredFields.getAmount()) {
+                        if (fetchedCard.getAccount().getAccountNumber().equals(requiredFields.getSrcAccount())) {
+                            Optional<Account> destinationAccount = accountRepository.findById(requiredFields.getDestAccount());
+                            if (destinationAccount.isPresent()) {
+                                Account destAccount = destinationAccount.get();
+                                srcAccount.withdraw(requiredFields.getAmount());
+                                accountRepository.saveAndFlush(srcAccount);
+
+                                Transaction transaction = new Transaction();
+                                transaction.setTrxType(TransactionType.TRANSFER);
+                                transaction.setSrcAccount(srcAccount);
+                                transaction.setDestAccount(destAccount);
+                                transactionRepository.saveAndFlush(transaction);
+
+                                destAccount.deposit(requiredFields.getAmount());
+                                accountRepository.saveAndFlush(destAccount);
+
+                                return true;
+                            }
+                            throw new CustomizedException("Destination account not found");
+                        }
+                        throw new CustomizedException("Source account is invalid");
+                    }
+                    throw new CustomizedException("Amount exceeds current available balance");
+                }
+                throw new CustomizedException("Amount can't be negative");
+            }
+            throw new CustomizedException("Incorrect PIN");
+        }
+        throw new CustomizedException("Card Not Found");
+    }
 }
-
-
-
 
 
 

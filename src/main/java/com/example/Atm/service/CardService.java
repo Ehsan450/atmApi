@@ -19,6 +19,7 @@ public class CardService {
         return cardRepository.findById(cardNo);
 
     }
+
     public List<Card> findAllCards(){
         return cardRepository.findAll();
     }
@@ -26,6 +27,4 @@ public class CardService {
     public List<Card> cardAllottedAccount(String accountNo){
         return cardRepository.findAllByAccountAccountNumber(accountNo);
     }
-
-
 }

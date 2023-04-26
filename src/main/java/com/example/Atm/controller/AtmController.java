@@ -23,10 +23,8 @@ public class AtmController {
     }
 
 
-    @PostMapping(value = "/deposit")
+    @PostMapping(value = "/deposit", consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<?> depositBalance(@RequestBody RequiredFields requiredFields) {
-        // atmService.deposit(actions.getCardNo(), actions.getPin(), actions.getAmount());
-
         boolean successful = this.atmService.deposit(requiredFields.getCardNo(), requiredFields.getPin(), requiredFields.getAmount());
 
         JSONObject jsonObject = new JSONObject();
@@ -35,7 +33,7 @@ public class AtmController {
         return new ResponseEntity<>(jsonObject.toString(), HttpStatus.OK);
     }
 
-    @PostMapping(value = "/withdraw")
+    @PostMapping(value = "/withdraw", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> withdrawBalance(@RequestBody RequiredFields requiredFields) {
         boolean done = this.atmService.withdraw(requiredFields.getCardNo(), requiredFields.getPin(), requiredFields.getAmount());
         JSONObject jsonObject = new JSONObject();
@@ -45,4 +43,11 @@ public class AtmController {
                 HttpStatus.OK);
     }
 
+    @PostMapping(value = "/transfer", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> transferBalance(@RequestBody RequiredFields requiredFields) {
+        boolean done = this.atmService.transfer(requiredFields);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("isSuccessful", done);
+        return new ResponseEntity<>(jsonObject.toString(), HttpStatus.OK);
+    }
 }
